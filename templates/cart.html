@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %} Cart {% endblock %}
+
+{% block content %}
+<h2>Ваш кошик</h2>
+{% if cart %}
+<table class="table table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+
+    </tr>
+    {% for item in cart %}
+    <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.price }} $</td>
+        <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+            <form action="/update_quantity//{{ loop.index0 }}/minus" method="post">
+                <button class="btn btn-danger btn-sm">-</button>
+            </form>
+                <span style="min-width:20; text-align:center;">
+                    {{ item.qty }}
+                </span>
+            <form action="/update_quantity//{{ loop.index0 }}/plus" method="post">
+                <button class="btn btn-danger btn-sm">+</button>
+            </form>
+            </div>
+        </td>
+
+    </tr>
+
+{% endfor %}
+</table>
+
+<h3>Sum: {{ total }} $</h3>
+
+<form action="/create-checkout-session" method="post">
+    <button class="btn btn-success btn-lg">
+        Credit/Debit Card
+    </button>
+
+</form>
+{% else %}
+<p> Cart Clear</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %} Score {% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/review.css">
+<div class="container">
+    <h1>Опитувальник про піцерію</h1>
+    <form action="/score" method="POST">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="rating">Оцініть піцерію(1-5)</label>
+        <select id="rating" name="rating" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+
+</select>
+       <label for="feedback">Feedback</label>
+       <textarea id="feedback" name="feedback" rows="4" required>
+       </textarea>
+       <button type="submit">Submit</button>
+
+
+
+
+    </form>
+
+
+</div>
+
+
+{% endblock %}
