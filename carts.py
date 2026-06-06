@@ -5,7 +5,7 @@ import stripe
 
 carts_bp = Blueprint('carts', __name__)
 
-with open("C:\\Users\\stas1\\PycharmProjects\\PythonProjectWeb\\templates\\keys.json", "r", encoding="utf-8") as file:
+with open("C:\\Users\\stas1\\OneDrive\\Документи\\GitHub\\MyPizzaWebsite\\templates\\keys.json", "r", encoding="utf-8") as file:
     data = json.load(file)
 
 stripe.api_key = data["stripe"]

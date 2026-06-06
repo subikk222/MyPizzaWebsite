@@ -8,7 +8,7 @@ from auth import auth_bp
 import stripe
 import json
 
-with open("C:\\Users\\stas1\\PycharmProjects\\PythonProjectWeb\\templates\\keys.json", "r", encoding="utf-8") as file: data = json.load(file)
+with open("C:\\Users\\stas1\\OneDrive\\Документи\\GitHub\\MyPizzaWebsite\\templates\\keys.json", "r", encoding="utf-8") as file: data = json.load(file)
 
 stripe.api_key = data["stripe"]
 
