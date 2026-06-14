@@ -17,7 +17,11 @@ def login():
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['user_name'] = user['name']
-            return redirect(url_for('auth.profile'))
+
+            if user['name'] == 'Admin':
+                return redirect(url_for('auth.profile_admin'))
+            else:
+                return redirect(url_for('auth.profile'))
         else:
             flash('Invalid email or password')
     return render_template('login.html')
@@ -50,6 +54,12 @@ def profile():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     return render_template('profile.html', name=session['user_name'])
+
+@auth_bp.route('/profileadmin')
+def profile_admin():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    return render_template('profileadmin.html', name=session['user_name'])
 
 @auth_bp.route('/logout')
 def logout():

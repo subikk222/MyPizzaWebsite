@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Profile{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        background-color: #111;
+    }
+
+    .profile-box {
+        background-color: #222;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+        margin: 30px auto;
+        text-align: center;
+        color: white;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        margin: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .google-btn {
+        background-color: #4285F4;
+        color: white;
+    }
+
+    .logout-btn {
+        background-color: #d9534f;
+        color: white;
+    }
+</style>
+
+<div class="profile-box">
+    <h2>Administrator Profile</h2>
+
+    <p>Hello Administrator, this is a private company account.</p>
+
+    <hr>
+
+    <p><strong>Access Level:</strong> Admin</p>
+    <p><strong>Status:</strong> Active</p>
+
+    <a href="https://www.google.com/">
+        <button class="btn google-btn">Google</button>
+    </a>
+
+    <a href="/logout">
+        <button class="btn logout-btn">Logout</button>
+    </a>
+</div>
+
+{% endblock %}
