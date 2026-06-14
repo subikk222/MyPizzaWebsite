@@ -1,14 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from base_data import *
-import json
 import stripe
 
 carts_bp = Blueprint('carts', __name__)
-
-with open("C:\\Users\\stas1\\OneDrive\\Документи\\GitHub\\MyPizzaWebsite\\templates\\keys.json", "r", encoding="utf-8") as file:
-    data = json.load(file)
-
-stripe.api_key = data["stripe"]
 
 
 @carts_bp.route('/create-checkout-session', methods=['POST'])

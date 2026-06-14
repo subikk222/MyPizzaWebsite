@@ -4,16 +4,14 @@ import sqlite3
 from base_data import *
 from carts import carts_bp
 from auth import auth_bp
+from config import Config
 
 import stripe
-import json
-
-with open("C:\\Users\\stas1\\OneDrive\\Документи\\GitHub\\MyPizzaWebsite\\templates\\keys.json", "r", encoding="utf-8") as file: data = json.load(file)
-
-stripe.api_key = data["stripe"]
 
 app = Flask(__name__)
-app.secret_key = 'qwerty'
+app.config.from_object(Config)
+
+stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
 app.register_blueprint(carts_bp)
 app.register_blueprint(auth_bp)
@@ -41,9 +39,7 @@ def thankyou():
 def index():
     return render_template('index.html')
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_table()
     create_user()
-    app.run(debug=True)
-
-
+    app.run(debug=app.config["DEBUG"])
