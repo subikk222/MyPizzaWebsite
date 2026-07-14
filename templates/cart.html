@@ -18,13 +18,13 @@
         <td>{{ item.price }} $</td>
         <td>
             <div style="display:flex; align-items:center; gap:8px;">
-            <form action="/update_quantity//{{ loop.index0 }}/minus" method="post">
+            <form action="{{ url_for('cart.update_quantity', index=loop.index0, action='minus') }}" method="post">
                 <button class="btn btn-danger btn-sm">-</button>
             </form>
                 <span style="min-width:20; text-align:center;">
                     {{ item.qty }}
                 </span>
-            <form action="/update_quantity//{{ loop.index0 }}/plus" method="post">
+            <form action="{{ url_for('cart.update_quantity', index=loop.index0, action='plus') }}" method="post">
                 <button class="btn btn-danger btn-sm">+</button>
             </form>
             </div>
@@ -37,7 +37,7 @@
 
 <h3>Sum: {{ total }} $</h3>
 
-<form action="/create-checkout-session" method="post">
+<form action="{{ url_for('cart.create_checkout_session') }" method="post">
     <button class="btn btn-success btn-lg">
         Credit/Debit Card
     </button>

@@ -1,45 +1,33 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from werkzeug.security import generate_password_hash, check_password_hash
-import sqlite3
-from base_data import *
-from carts import carts_bp
-from auth import auth_bp
-from config import Config
-
+from flask import Flask
 import stripe
+from config import Config
+from database import init_db
+from models import db
+from routes.auth import auth_bp
+from routes.cart import cart_bp
+from routes.reviews import reviews_bp
+from routes.shop import shop_bp
 
-app = Flask(__name__)
-app.config.from_object(Config)
 
-stripe.api_key = app.config["STRIPE_SECRET_KEY"]
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-app.register_blueprint(carts_bp)
-app.register_blueprint(auth_bp)
+    db.init_app(app)
+    stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
-@app.route('/score', methods=['GET', 'POST'])
-def score():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        rating = request.form['rating']
-        feedback = request.form['feedback']
+    app.register_blueprint(shop_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(cart_bp)
+    app.register_blueprint(reviews_bp)
 
-        conn = get_db()
-        conn.execute('INSERT INTO base(name, email, rating, feedback) VALUES (?, ?, ?, ?)',
-                     (name, email, rating, feedback))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('thankyou'))
-    return render_template('score.html')
-@app.route('/thankyou')
-def thankyou():
-    return render_template('thank.html')
+    return app
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+
+app = create_app()
+
 
 if __name__ == "__main__":
-    create_table()
-    create_user()
+    with app.app_context():
+        init_db()
     app.run(debug=app.config["DEBUG"])

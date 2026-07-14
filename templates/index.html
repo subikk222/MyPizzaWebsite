@@ -5,16 +5,19 @@
 {% block content %}
 <div class="container" style="margin-top: 30px;">
     <div class="row">
-
-        <div class="col-md-4">
+        {% for product in products %}
+        <div class="col-md-4" style="margin-bottom: 20px;">
             <div class="panel panel-default">
-                <div class="panel-heading text-center"><strong>Маргарита</strong></div>
+                <div class="panel-heading text-center"><strong>{{ product.name }}</strong></div>
                 <div class="panel-body text-center">
-                    <img src="https://pics.craiyon.com/2023-05-22/b6dee723d68d461c891cc552095529cb.webp" class="img-responsive center-block" style="width:200px; height:200px;">
-                    <p>Класична піца з томатами та сиром моцарела.</p>
+                    {% if product.image_url %}
+                    <img src="{{ product.image_url }}" class="img-responsive center-block" style="width:200px; height:200px; object-fit: cover;">
+                    {% endif %}
+                    <p>{{ product.description }}</p>
+                    <p><strong>{{ product.price }} $</strong></p>
 
                     <button type="button" class="btn btn-success" onclick="showCounter(this)">Замовити</button>
-                    <form action="/add_cart/1" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
+                    <form action="{{ url_for('cart.add_cart', pizza_id=product.id) }}" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
                         <div style="display:flex; align-items:center; gap:5px;">
                             <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, -1)">-</button>
                             <input type="number" name="quantity" value="1" min="1" style="width: 40px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" readonly>
@@ -25,109 +28,9 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center"><strong>Пепероні</strong></div>
-                <div class="panel-body text-center">
-                    <img src="https://tse4.mm.bing.net/th/id/OIP.tDgGf_psZbO2DOO6ZaSe_AHaE7?pid=Api&P=0&h=180" class="img-responsive center-block" style="width:200px; height:200px;">
-                    <p>Піца з пікантною ковбаскою пепероні та сиром.</p>
-
-                    <button type="button" class="btn btn-success" onclick="showCounter(this)">Замовити</button>
-                    <form action="/add_cart/2" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, -1)">-</button>
-                            <input type="number" name="quantity" value="1" min="1" style="width: 40px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" readonly>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, 1)">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">Додати</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center"><strong>Гавайська</strong></div>
-                <div class="panel-body text-center">
-                    <img src="https://thumbs.dreamstime.com/b/pineapple-hawaiian-pizza-chicken-pineapple-cut-pieces-white-background-isolate-pineapple-hawaiian-pizza-261782984.jpg" class="img-responsive center-block" style="width:200px; height:200px;">
-                    <p>Курка, ананас та сир — незвичне поєднання.</p>
-
-                    <button type="button" class="btn btn-success" onclick="showCounter(this)">Замовити</button>
-                    <form action="/add_cart/3" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, -1)">-</button>
-                            <input type="number" name="quantity" value="1" min="1" style="width: 40px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" readonly>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, 1)">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">Додати</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="row" style="margin-top: 20px;">
-
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center"><strong>4 Сири</strong></div>
-                <div class="panel-body text-center">
-                    <img src="https://static.vecteezy.com/system/resources/previews/056/914/536/non_2x/delicious-4-cheese-pizza-isolated-on-transparent-background-melted-mozzarella-parmesan-gorgonzola-and-ricotta-italian-cuisine-cheesy-appetizing-png.png" class="img-responsive center-block" style="width:200px; height:200px;">
-                    <p>Моцарела, дорблю, пармезан і чедер.</p>
-
-                    <button type="button" class="btn btn-success" onclick="showCounter(this)">Замовити</button>
-                    <form action="/add_cart/4" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, -1)">-</button>
-                            <input type="number" name="quantity" value="1" min="1" style="width: 40px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" readonly>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, 1)">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">Додати</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center"><strong>Мʼясна</strong></div>
-                <div class="panel-body text-center">
-                    <img src="https://tse1.mm.bing.net/th/id/OIP.Ty8YcY7ijZEOCB4RKW5S2QHaHa?pid=Api&P=0&h=180" class="img-responsive center-block" style="width:200px; height:200px;">
-                    <p>Бекон, шинка, ковбаски та сир.</p>
-
-                    <button type="button" class="btn btn-success" onclick="showCounter(this)">Замовити</button>
-                    <form action="/add_cart/5" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, -1)">-</button>
-                            <input type="number" name="quantity" value="1" min="1" style="width: 40px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" readonly>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, 1)">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">Додати</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading text-center"><strong>Овочева</strong></div>
-                <div class="panel-body text-center">
-                    <img src="https://tse4.mm.bing.net/th/id/OIP.K6tQaLvFU5tGCALQaRFhrgHaHa?pid=Api&P=0&h=180" class="img-responsive center-block" style="width:200px; height:200px;">
-                    <p>Свіжі овочі, маслини та томатний соус.</p>
-
-                    <button type="button" class="btn btn-success" onclick="showCounter(this)">Замовити</button>
-                    <form action="/add_cart/6" method="POST" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, -1)">-</button>
-                            <input type="number" name="quantity" value="1" min="1" style="width: 40px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" readonly>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="changeQty(this, 1)">+</button>
-                        </div>
-                        <button type="submit" class="btn btn-success btn-sm">Додати</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
+        {% else %}
+        <p class="text-center">Наразі немає доступних піц.</p>
+        {% endfor %}
     </div>
 </div>
 

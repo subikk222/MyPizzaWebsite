@@ -7,7 +7,7 @@
 <h2>Profile</h2>
     <p>Hello, {{ name }} </p>
 
-    <a href="/logout">
+    <a href="{{url_for('auth.logout')}}">
         <span class="glyphicon glyphicon-log-out"></span><button>Exit</button></a>
 
 {% endblock %}
