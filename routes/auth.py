@@ -22,7 +22,6 @@ def login():
             session["user_name"] = user.name
             session["user_role"] = user.role
 
-
             if user.role == "admin":
                 return redirect(url_for("auth.profile_admin"))
             return redirect(url_for("auth.profile"))
