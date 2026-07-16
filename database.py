@@ -41,6 +41,15 @@ DEFAULT_PRODUCTS = [
     },
 ]
 
+DEFAULT_USERS = [
+    {
+        "name": "Admin",
+        "phone": "admin",
+        "email": "admin@gmail.com",
+        "password": "superadmin",
+        "role": "admin"
+    }
+]
 
 def _migrate_users_role():
     inspector = inspect(db.engine)
@@ -67,8 +76,16 @@ def seed_products():
     db.session.add_all([Product(**product) for product in DEFAULT_PRODUCTS])
     db.session.commit()
 
+def seed_users():
+    if User.query.count() > 0:
+        return
+
+    db.session.add_all([User(**user) for user in DEFAULT_USERS])
+    db.session.commit()
+
 
 def init_db():
     db.create_all()
     _migrate_users_role()
     seed_products()
+    seed_users()

@@ -27,7 +27,26 @@
             <li><a href="{{ url_for('reviews.score') }}" class="menu-btn">Review</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="{{ url_for('auth.login') }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+            {% if session.get('user_id') %}
+                <li>
+                    <a href="{% if session.get('user_role') == 'admin' %}{{ url_for('auth.profile_admin') }}{% else %}{{ url_for('auth.profile') }}{% endif %}">
+                        <span class="glyphicon glyphicon-user"></span> {{ session.get('user_name', 'Profile') }}
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.logout') }}">
+                        <span class="glyphicon glyphicon-log-out"></span> Logout
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{{ url_for('auth.login') }}">
+                        <span class="glyphicon glyphicon-log-in"></span> Login
+                    </a>
+                </li>
+            {% endif %}
+
+
         </ul>
     </div>
 </nav>

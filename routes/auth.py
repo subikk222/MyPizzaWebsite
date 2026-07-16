@@ -20,6 +20,7 @@ def login():
         if user and check_password_hash(user.password, password):
             session["user_id"] = user.id
             session["user_name"] = user.name
+            session["user_role"] = user.role
 
             if user.role == "admin":
                 return redirect(url_for("auth.profile_admin"))

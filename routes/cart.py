@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 
-from models import Product, db
+from models import Product, Order, User, db
 
 import stripe
 
@@ -23,7 +23,7 @@ def cart():
 
 @cart_bp.route("/add_cart/<int:pizza_id>", methods=["POST"])
 def add_cart(pizza_id):
-    quantity = int(request.form.get("quantity", 1))
+    quantity = max(1, int(request.form.get("quantity", 1)))
     pizza = db.session.get(Product, pizza_id)
 
     if not pizza:
@@ -98,6 +98,26 @@ def create_checkout_session():
 
 @cart_bp.route("/success")
 def success():
+    cart_items = session.get("cart", [])
+
+    if cart_items:
+        total = sum(item["price"] * item["qty"] for item in cart_items)
+
+        user = None
+
+        if "user_id" in session:
+            user = db.session.get(User, session["user_id"])
+
+        order = Order(
+            user_id=user.id if user else None,
+            customer_name=user.name if user else "Guest",
+            customer_email=user.email if user else "guest@example.com",
+            total_price=total,
+        )
+
+        db.session.add(order)
+        db.session.commit()
+
     session.pop("cart", None)
     return render_template("success.html")
 
