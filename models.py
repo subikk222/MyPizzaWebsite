@@ -62,3 +62,29 @@ class Review(db.Model):
         }
 
 
+
+class Order(db.Model):
+    __tablename__ = "orders"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+    customer_name = db.Column(db.String(120), nullable=False)
+    customer_email = db.Column(db.String(120), nullable=False)
+
+    total_price = db.Column(db.Float, nullable=False)
+
+    status = db.Column(db.String(50), nullable=False, default="new")
+
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "customer_name": self.customer_name,
+            "customer_email": self.customer_email,
+            "total_price": self.total_price,
+            "status": self.status,
+        }
