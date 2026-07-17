@@ -1,5 +1,5 @@
 from sqlalchemy import inspect, text
-
+import bcrypt
 from models import Product, User, db
 
 DEFAULT_PRODUCTS = [
@@ -46,7 +46,10 @@ DEFAULT_USERS = [
         "name": "Admin",
         "phone": "admin",
         "email": "admin@gmail.com",
-        "password": "superadmin",
+        "password": bcrypt.hashpw(
+            "superadmin".encode("utf-8"),
+            bcrypt.gensalt()
+        ).decode("utf-8"),
         "role": "admin"
     }
 ]
