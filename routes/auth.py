@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import bcrypt
 from models import User, db
 
 auth_bp = Blueprint("auth", __name__)
@@ -17,16 +17,27 @@ def login():
 
         user = User.query.filter_by(email=email).first()
 
-        if user and check_password_hash(user.password, password):
-            session["user_id"] = user.id
-            session["user_name"] = user.name
-            session["user_role"] = user.role
-
+        if user:
             if user.role == "admin":
-                return redirect(url_for("auth.profile_admin"))
-            return redirect(url_for("auth.profile"))
+                valid = bcrypt.checkpw(
+                    password.encode("utf-8"),
+                    user.password.encode("utf-8")
+                )
+            else:
+                valid = check_password_hash(user.password, password)
+
+            if valid:
+                session["user_id"] = user.id
+                session["user_name"] = user.name
+                session["user_role"] = user.role
+
+                if user.role == "admin":
+                    return redirect(url_for("auth.profile_admin"))
+
+                return redirect(url_for("auth.profile"))
 
         flash("Invalid email or password")
+
     return render_template("login.html")
 
 
