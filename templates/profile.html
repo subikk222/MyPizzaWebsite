@@ -10,4 +10,74 @@
     <a href="{{url_for('auth.logout')}}">
         <span class="glyphicon glyphicon-log-out"></span><button>Exit</button></a>
 
+
+<span class="glyphicon glyphicon-cog"></span><button onclick="myFunction()">Settings</button>
+
+
+<div id="menu" style="display: none;">
+    <button onclick="showForm('nameForm')">Reset Name</button>
+    <button onclick="showForm('numberForm')">Reset Number</button>
+    <button onclick="showForm('emailForm')">Reset Email</button>
+    <button onclick="showForm('passwordForm')">Reset Password</button>
+</div>
+
+   <a href="{{url_for('auth.reset_name')}}">
+        <div id="nameForm"  style="display: none;">
+            <form action="/reset_name" method="POST">
+                <input type="text" name="new_name" placeholder="New name">
+                <button type="submit">Save</button>
+            </form>
+        </div>
+
+<div id="numberForm"  style="display: none;">
+    <form action="/reset_number" method="POST">
+        <input type="text" name="new_number" placeholder="New number">
+        <button type="submit">Save</button>
+    </form>
+</div>
+
+<div id="emailForm"  style="display: none;">
+    <form action="/reset_email" method="POST">
+        <input type="text" name="new_email" placeholder="New email">
+        <button type="submit">Save</button>
+    </form>
+</div>
+
+<div id="passwordForm"  style="display: none;">
+    <form action="/reset_password" method="POST">
+        <input type="text" name="new_password" placeholder="New password">
+        <button type="submit">Save</button>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+<script>
+    function myFunction() {
+    const menu = document.getElementById("menu");
+    if (menu.style.display === "none") {
+            menu.style.display = "block";
+        } else {
+            menu.style.display = "none";
+    }
+}
+
+function showForm(formId) {
+    document.getElementById("nameForm").style.display = "none";
+    document.getElementById("numberForm").style.display = "none";
+    document.getElementById("emailForm").style.display = "none";
+    document.getElementById("passwordForm").style.display = "none";
+}
+
+document.getElementById(formId).style.display = "block";
+
+</script>
+
 {% endblock %}
+
