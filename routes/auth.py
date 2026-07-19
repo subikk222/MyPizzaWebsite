@@ -1,9 +1,17 @@
+
+
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import bcrypt
 from models import User, db
 
 auth_bp = Blueprint("auth", __name__)
+
+
+def _current_user():
+    if "user_id" not in session:
+        return None
+    return db.session.get(User, session["user_id"])
 
 
 # --- Веб: логін, реєстрація, профіль ---
@@ -66,7 +74,13 @@ def register():
 def profile():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
-    return render_template("profile.html", name=session["user_name"])
+
+    user = db.session.get(User, session["user_id"])
+    if not user:
+        session.clear()
+        return redirect(url_for("auth.login"))
+
+    return render_template("profile.html", user=user)
 
 
 @auth_bp.route("/profileadmin")
@@ -88,6 +102,85 @@ def logout():
     return redirect(url_for("shop.index"))
 
 
+@auth_bp.route("/reset_name", methods=["POST"])
+def reset_name():
+    user = _current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+
+    new_name = (request.form.get("new_name") or "").strip()
+    if not new_name:
+        flash("Імʼя не може бути порожнім.", "danger")
+        return redirect(url_for("auth.profile"))
+
+    user.name = new_name
+    session["user_name"] = new_name
+    db.session.commit()
+    flash("Імʼя успішно оновлено.", "success")
+    return redirect(url_for("auth.profile"))
+
+
+@auth_bp.route("/reset_number", methods=["POST"])
+def reset_number():
+    user = _current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+
+    new_number = (request.form.get("new_number") or "").strip()
+    if not new_number.isdigit():
+        flash("Номер телефону не може бути порожнім.", "danger")
+        return redirect(url_for("auth.profile"))
+
+    user.phone = new_number
+    db.session.commit()
+    flash("Номер телефону успішно оновлено.", "success")
+    return redirect(url_for("auth.profile"))
+
+
+@auth_bp.route("/reset_email", methods=["POST"])
+def reset_email():
+    user = _current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+
+    new_email = (request.form.get("new_email") or "").strip().lower()
+    if not new_email or "@" not in new_email:
+        flash("Введіть коректний email.", "danger")
+        return redirect(url_for("auth.profile"))
+
+    existing = User.query.filter_by(email=new_email).first()
+    if existing and existing.id != user.id:
+        flash("Цей email уже використовується іншим акаунтом.", "danger")
+        return redirect(url_for("auth.profile"))
+
+    user.email = new_email
+    db.session.commit()
+    flash("Email успішно оновлено.", "success")
+    return redirect(url_for("auth.profile"))
+
+
+@auth_bp.route("/reset_password", methods=["POST"])
+def reset_password():
+    user = _current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+
+    new_password = request.form.get("new_password") or ""
+    if len(new_password) < 6:
+        flash("Пароль має містити щонайменше 6 символів.", "danger")
+        return redirect(url_for("auth.profile"))
+
+    if user.role == "admin":
+        user.password = bcrypt.hashpw(
+            new_password.encode("utf-8"),
+            bcrypt.gensalt(),
+        ).decode("utf-8")
+    else:
+        user.password = generate_password_hash(new_password)
+
+    db.session.commit()
+    flash("Пароль успішно оновлено.", "success")
+    return redirect(url_for("auth.profile"))
 
 
 # --- JSON: CRUD користувачів (Postman, навчальні завдання) ---
@@ -187,23 +280,3 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"message": "Юзера видалено"})
-
-@auth_bp.route("/reset_name", methods=["POST"])
-def reset_name():
-    new_name = request.form["new_name"]
-    return redirect(url_for("profile.settings"))
-
-@auth_bp.route("/reset_number", methods=["POST"])
-def reset_number():
-    new_number = request.form["new_number"]
-    return redirect(url_for("profile.settings"))
-
-@auth_bp.route("/reset_email", methods=["POST"])
-def reset_email():
-    new_email = request.form["new_email"]
-    return redirect(url_for("profile.settings"))
-
-@auth_bp.route("/reset_password", methods=["POST"])
-def reset_password():
-    new_password = request.form["new_password"]
-    return redirect(url_for("profile.settings"))
