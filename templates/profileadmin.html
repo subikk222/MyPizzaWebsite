@@ -11,48 +11,88 @@
 
     .profile-box {
         background-color: #222;
-        padding: 20px;
-        border-radius: 10px;
-        width: 400px;
-        margin: 30px auto;
-        text-align: center;
         color: white;
+        width: 420px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid #444;
+        box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
+    }
+
+    .profile-box h2 {
+        margin-bottom: 20px;
+    }
+
+    .profile-box p {
+        font-size: 16px;
+        margin: 10px 0;
+    }
+
+    hr {
+        border-color: #444;
     }
 
     .btn {
-        padding: 10px 20px;
-        margin: 10px;
+        width: 170px;
+        padding: 10px;
+        margin: 8px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        color: white;
+        font-size: 15px;
+        transition: 0.3s;
     }
 
     .google-btn {
         background-color: #4285F4;
-        color: white;
+    }
+
+    .google-btn:hover {
+        background-color: #2d6cdf;
     }
 
     .logout-btn {
         background-color: #d9534f;
-        color: white;
+    }
+
+    .logout-btn:hover {
+        background-color: #c9302c;
+    }
+
+    .home-btn {
+        background-color: #5cb85c;
+    }
+
+    .home-btn:hover {
+        background-color: #449d44;
     }
 </style>
 
 <div class="profile-box">
+
     <h2>Administrator Profile</h2>
 
-    <p>Hello Administrator, this is a private company account.</p>
+    <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
 
     <hr>
 
-    <p><strong>Access Level:</strong> Admin</p>
+    <p><strong>Access Level:</strong> Administrator</p>
     <p><strong>Status:</strong> Active</p>
 
-    <a href="https://www.google.com/">
+    <br>
+
+    <a href="{{ url_for('shop.index') }}">
+        <button class="btn home-btn">Home</button>
+    </a>
+
+    <a href="https://www.google.com/" target="_blank">
         <button class="btn google-btn">Google</button>
     </a>
 
-    <a href="{{url_for('auth.logout')}}">
+    <a href="{{ url_for('auth.logout') }}">
         <button class="btn logout-btn">Logout</button>
     </a>
 </div>
