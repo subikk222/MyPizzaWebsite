@@ -51,6 +51,16 @@ DEFAULT_USERS = [
             bcrypt.gensalt()
         ).decode("utf-8"),
         "role": "admin"
+    },
+    {
+        "name": "AdminAccount",
+        "phone": "admin",
+        "email": "admin2@gmail.com",
+        "password": bcrypt.hashpw(
+            "superadmin".encode("utf-8"),
+            bcrypt.gensalt()
+        ).decode("utf-8"),
+        "role": "admin"
     }
 ]
 

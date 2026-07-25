@@ -5,7 +5,7 @@ from models import Product, db
 shop_bp = Blueprint("shop", __name__)
 
 
-# --- Веб: каталог піц ---
+# --- Web catalog of pizza ---
 
 
 @shop_bp.route("/")
@@ -14,7 +14,7 @@ def index():
     return render_template("index.html", products=products)
 
 
-# --- JSON: CRUD продуктів (Postman, навчальні завдання) ---
+# --- JSON: CRUD products (Postman, beginner task) ---
 
 
 @shop_bp.route("/products", methods=["GET"])
@@ -33,7 +33,7 @@ def create_product():
     image_url = (data.get("image_url") or "").strip()
 
     if not name or price in (None, ""):
-        return jsonify({"error": "Поля name та price обов'язкові"}), 400
+        return jsonify({"error": "The Name and Price fields are required"}), 400
 
     product = Product(
         name=name,
@@ -51,7 +51,7 @@ def create_product():
 def get_product(product_id):
     product = db.session.get(Product, product_id)
     if product is None:
-        return jsonify({"error": "Продукт не знайдено"}), 404
+        return jsonify({"error": "Product Not Found"}), 404
 
     return jsonify(product.to_dict())
 
@@ -64,11 +64,11 @@ def update_product_put(product_id):
     price = data.get("price")
 
     if not name or price in (None, ""):
-        return jsonify({"error": "Поля name та price обовʼязкові"}), 400
+        return jsonify({"error": "The Name and Price fields are required"}), 400
 
     product = db.session.get(Product, product_id)
     if product is None:
-        return jsonify({"error": "Продукт не знайдено"}), 404
+        return jsonify({"error": "Product Not Found"}), 404
 
     product.name = name
     product.price = float(price)
@@ -81,8 +81,8 @@ def update_product_put(product_id):
 def delete_product(product_id):
     product = db.session.get(Product, product_id)
     if product is None:
-        return jsonify({"error": "Продукт не знайдено"}), 404
+        return jsonify({"error": "Product Not Found"}), 404
 
     db.session.delete(product)
     db.session.commit()
-    return jsonify({"message": "Продукт видалено"})
+    return jsonify({"message": "Product Removed"})

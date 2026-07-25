@@ -35,14 +35,15 @@
                     </a>
 
                 </li>
+                {% if session.get('user_role') == 'admin' %}
+                    <li>
 
-                <li>
-                    <a href="{{session.get('user_role') == 'admin' }}{{ url_for('auth.profile_admin') }}">
-                        <span class="glyphicon glyphicon-user"></span> {{ session.get('user_name', 'Profile') }}
+                        <a href="{{ url_for('auth.profile_admin') }}">
+                            <span> Admin Panel</span>
 
-                    </a>
-                </li>
-
+                        </a>
+                    </li>
+                {% endif %}
                 <li>
                     <a href="{{ url_for('auth.logout') }}">
                         <span class="glyphicon glyphicon-log-out"></span> Logout

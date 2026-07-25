@@ -14,7 +14,7 @@ def _current_user():
     return db.session.get(User, session["user_id"])
 
 
-# --- Веб: логін, реєстрація, профіль ---
+# --- Web: login, registration, profile ---
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
@@ -57,11 +57,27 @@ def register():
         email = request.form["email"]
         password = generate_password_hash(request.form["password"])
 
+        password_text = request.form["password"]
+        admin_code = request.form.get("admin_code")
+
+        if admin_code == "pizza_admin":
+            role = "admin"
+
+            password = bcrypt.hashpw(
+                password_text.encode("utf-8"),
+                bcrypt.gensalt()
+            ).decode("utf-8")
+
+        else:
+            role = "user"
+            password = generate_password_hash(password_text)
+
+
         if User.query.filter_by(email=email).first():
             flash("This user already exists.", "danger")
             return render_template("register.html")
 
-        user = User(name=name, phone=phone, email=email, password=password)
+        user = User(name=name, phone=phone, email=email, password=password, role=role)
         db.session.add(user)
         db.session.commit()
         flash("Thank you for registering. Please login.", "info")
@@ -110,13 +126,13 @@ def reset_name():
 
     new_name = (request.form.get("new_name") or "").strip()
     if not new_name:
-        flash("Імʼя не може бути порожнім.", "danger")
+        flash("The Name can't be empty.", "danger")
         return redirect(url_for("auth.profile"))
 
     user.name = new_name
     session["user_name"] = new_name
     db.session.commit()
-    flash("Імʼя успішно оновлено.", "success")
+    flash("The Name is successfully updated.", "success")
     return redirect(url_for("auth.profile"))
 
 
@@ -128,12 +144,12 @@ def reset_number():
 
     new_number = (request.form.get("new_number") or "").strip()
     if not new_number.isdigit():
-        flash("Номер телефону не може бути порожнім.", "danger")
+        flash("The Phone Number can't be empty.", "danger")
         return redirect(url_for("auth.profile"))
 
     user.phone = new_number
     db.session.commit()
-    flash("Номер телефону успішно оновлено.", "success")
+    flash("The Phone Number is successfully updated.", "success")
     return redirect(url_for("auth.profile"))
 
 
@@ -145,17 +161,17 @@ def reset_email():
 
     new_email = (request.form.get("new_email") or "").strip().lower()
     if not new_email or "@" not in new_email:
-        flash("Введіть коректний email.", "danger")
+        flash("Enter a valid email address.", "danger")
         return redirect(url_for("auth.profile"))
 
     existing = User.query.filter_by(email=new_email).first()
     if existing and existing.id != user.id:
-        flash("Цей email уже використовується іншим акаунтом.", "danger")
+        flash("This email is already in use by another account.", "danger")
         return redirect(url_for("auth.profile"))
 
     user.email = new_email
     db.session.commit()
-    flash("Email успішно оновлено.", "success")
+    flash("Email is successfully updated.", "success")
     return redirect(url_for("auth.profile"))
 
 
@@ -167,7 +183,7 @@ def reset_password():
 
     new_password = request.form.get("new_password") or ""
     if len(new_password) < 6:
-        flash("Пароль має містити щонайменше 6 символів.", "danger")
+        flash("The password must contain at least 6 characters.", "danger")
         return redirect(url_for("auth.profile"))
 
     if user.role == "admin":
@@ -179,11 +195,11 @@ def reset_password():
         user.password = generate_password_hash(new_password)
 
     db.session.commit()
-    flash("Пароль успішно оновлено.", "success")
+    flash("Password is successfully updated.", "success")
     return redirect(url_for("auth.profile"))
 
 
-# --- JSON: CRUD користувачів (Postman, навчальні завдання) ---
+# --- JSON: CRUD users (Postman, beginner task) ---
 
 
 @auth_bp.route("/users", methods=["GET"])
@@ -202,7 +218,7 @@ def create_user():
     password = (data.get("password") or "").strip()
 
     if not name or not email:
-        return jsonify({"error": "Поля name та email обовʼязкові"}), 400
+        return jsonify({"error": "The Name and Price fields are require"}), 400
 
     user = User(name=name, email=email, phone=phone, password=password)
     db.session.add(user)
@@ -215,7 +231,7 @@ def create_user():
 def get_user(user_id):
     user = db.session.get(User, user_id)
     if user is None:
-        return jsonify({"error": "Юзер не знайдено"}), 404
+        return jsonify({"error": "User Not Found"}), 404
 
     return jsonify(user.to_dict())
 
@@ -228,11 +244,11 @@ def update_user_put(user_id):
     email = (data.get("email") or "").strip()
 
     if not name or not email:
-        return jsonify({"error": "Поля name та email обовʼязкові"}), 400
+        return jsonify({"error": "The Name and Price fields are required"}), 400
 
     user = db.session.get(User, user_id)
     if user is None:
-        return jsonify({"error": "Юзера не знайдено"}), 404
+        return jsonify({"error": "User Not Found"}), 404
 
     user.name = name
     user.email = email
@@ -246,20 +262,20 @@ def update_user_patch(user_id):
     data = request.get_json(silent=True) or {}
 
     if "name" not in data and "email" not in data:
-        return jsonify({"error": "Потрібно передати name і/або email"}), 400
+        return jsonify({"error": "Name and/or Email must be provided"}), 400
 
     name = data["name"].strip() if "name" in data else None
     email = data["email"].strip() if "email" in data else None
 
     if name is not None and not name:
-        return jsonify({"error": "Поле name не може бути порожнім"}), 400
+        return jsonify({"error": "The Name field cannot be empty"}), 400
 
     if email is not None and not email:
-        return jsonify({"error": "Поле email не може бути порожнім"}), 400
+        return jsonify({"error": "The Email field cannot be empty"}), 400
 
     user = db.session.get(User, user_id)
     if user is None:
-        return jsonify({"error": "Юзера не знайдено"}), 404
+        return jsonify({"error": "User Not Found"}), 404
 
     if name is not None:
         user.name = name
@@ -275,8 +291,8 @@ def update_user_patch(user_id):
 def delete_user(user_id):
     user = db.session.get(User, user_id)
     if user is None:
-        return jsonify({"error": "Юзер не знайдено"}), 404
+        return jsonify({"error": "User Not Found"}), 404
 
     db.session.delete(user)
     db.session.commit()
-    return jsonify({"message": "Юзера видалено"})
+    return jsonify({"message": "User Removed"}), 200

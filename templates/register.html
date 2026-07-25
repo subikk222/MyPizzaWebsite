@@ -11,7 +11,26 @@
         <input name="phone" placeholder="phone" value="{{ phone or '' }}" required>
         <input name="email" placeholder="email" value="{{ email or '' }}" required>
         <input name="password" placeholder="password" value="{{ password or '' }}" required>
+        <button type="button" onclick="showAdminBox()">Admin?</button>
+        <div id="adminBox" style="display: none; margin-bottom: 10px;">
+            <input name="admin_code" placeholder="Enter Admin secret phrase">
+        </div>
+
         <button type="submit">REGISTER</button>
-    </form>
+        </form>
+        </div>
+
+
+
+    <script>
+        function showAdminBox(){
+            var box = document.getElementById("adminBox");
+            if (box.style.display == "none"){
+                box.style.display = "block";
+            } else {
+                box.style.display = "none";
+            }
+        }
+    </script>
 </div>
 {% endblock %}
