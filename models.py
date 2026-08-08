@@ -72,6 +72,10 @@ class Order(db.Model):
     customer_name = db.Column(db.String(120), nullable=False)
     customer_email = db.Column(db.String(120), nullable=False)
 
+    pizza = db.Column(db.String(120), nullable=False)
+
+    quantity = db.Column(db.Integer, nullable=False)
+
     total_price = db.Column(db.Float, nullable=False)
 
     status = db.Column(db.String(50), nullable=False, default="new")
@@ -84,6 +88,8 @@ class Order(db.Model):
             "user_id": self.user_id,
             "customer_name": self.customer_name,
             "customer_email": self.customer_email,
+            "pizza": self.pizza,
+            "quantity": self.quantity,
             "total_price": self.total_price,
             "status": self.status,
         }

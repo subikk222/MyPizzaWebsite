@@ -5,37 +5,37 @@ from models import Product, User, db
 DEFAULT_PRODUCTS = [
     {
         "name": "Маргарита",
-        "price": 150,
+        "price": 25,
         "description": "Класична піца з томатами та сиром моцарела.",
         "image_url": "https://pics.craiyon.com/2023-05-22/b6dee723d68d461c891cc552095529cb.webp",
     },
     {
         "name": "Пепероні",
-        "price": 220,
+        "price": 30,
         "description": "Піца з пікантною ковбаскою пепероні та сиром.",
         "image_url": "https://tse4.mm.bing.net/th/id/OIP.tDgGf_psZbO2DOO6ZaSe_AHaE7?pid=Api&P=0&h=180",
     },
     {
         "name": "Гавайська",
-        "price": 200,
+        "price": 30,
         "description": "Курка, ананас та сир — незвичне поєднання.",
         "image_url": "https://thumbs.dreamstime.com/b/pineapple-hawaiian-pizza-chicken-pineapple-cut-pieces-white-background-isolate-pineapple-hawaiian-pizza-261782984.jpg",
     },
     {
         "name": "4 Сири",
-        "price": 150,
+        "price": 30,
         "description": "Моцарела, дорблю, пармезан і чедер.",
         "image_url": "https://static.vecteezy.com/system/resources/previews/056/914/536/non_2x/delicious-4-cheese-pizza-isolated-on-transparent-background-melted-mozzarella-parmesan-gorgonzola-and-ricotta-italian-cuisine-cheesy-appetizing-png.png",
     },
     {
         "name": "Мʼясна",
-        "price": 320,
+        "price": 25,
         "description": "Бекон, шинка, ковбаски та сир.",
         "image_url": "https://tse1.mm.bing.net/th/id/OIP.Ty8YcY7ijZEOCB4RKW5S2QHaHa?pid=Api&P=0&h=180",
     },
     {
         "name": "Овочева",
-        "price": 400,
+        "price": 20,
         "description": "Свіжі овочі, маслини та томатний соус.",
         "image_url": "https://tse4.mm.bing.net/th/id/OIP.K6tQaLvFU5tGCALQaRFhrgHaHa?pid=Api&P=0&h=180",
     },

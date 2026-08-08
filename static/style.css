@@ -3,10 +3,33 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background: url("/static/images/pizza-wooden-table-with-copy-space.jpg") no-repeat center center fixed;
+    background-size: cover;
 }
 
 .main-content {
     flex: 1;
+    background-color: rgba(255, 255, 255, 0.88);
+    padding-bottom: 20px;
+}
+
+.panel {
+    background-color: rgba(255, 243, 224, 0.92);
+    border-color: rgba(139, 90, 43, 0.35);
+}
+
+.panel-default > .panel-heading {
+    background-color: rgba(139, 90, 43, 0.85);
+    color: #fff;
+    border-color: rgba(139, 90, 43, 0.5);
+}
+
+.panel-default > .panel-heading strong {
+    color: #c5c16a;
+}
+
+.panel-default > .panel-body {
+    background-color: rgba(255, 236, 210, 0.95);
 }
 
 h1 {
