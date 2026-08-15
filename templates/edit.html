@@ -3,18 +3,38 @@
 {% block title %} Edit {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="/static/review.css">
+<style>
+    body {
+        background-color: #11111108
+    }
+    .edit-box {
+        background-color: #222;
+        color: black;
+        width: 420px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid #444;
+        box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
+    }
+</style>
 
+<div class="edit-box">
+    <h2>Edit User Payment</h2>
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
 
-</body>
-</html>
+    <hr>
+
+    <p><strong>Search</strong> User by ID:</p>
+
+    <input type="text" name="search_user_id" placeholder="User ID">
+    <button type="submit">Search</button>
+
+    <hr>
+</div>
+
 
 
 {% endblock %}

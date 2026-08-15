@@ -9,4 +9,4 @@ edit_bp = Blueprint("edit", __name__)
 @edit_bp.route('/editpayment', methods=['GET', 'POST'])
 def edit():
 
-    return edit("edit.html")
+    return render_template("edit.html")
