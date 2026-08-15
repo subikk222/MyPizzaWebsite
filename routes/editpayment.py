@@ -1,6 +1,12 @@
-from flask import Flask
-app = Flask(__name__)
+from flask import Flask, Blueprint, jsonify, render_template, request
+from models import User, db
 
-@app.route('/editpayment', methods=['GET', 'POST'])
+
+edit_bp = Blueprint("edit", __name__)
+
+
+
+@edit_bp.route('/editpayment', methods=['GET', 'POST'])
 def edit():
-    return edit("profileadmin.html")
+
+    return edit("edit.html")
