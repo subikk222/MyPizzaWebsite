@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 
-from models import Product, Order, User, db
+from models import Product, Order, OrderItem, User, db
 
 import stripe
 
@@ -102,9 +102,10 @@ def success():
 
     if cart_items:
         total = sum(item["price"] * item["qty"] for item in cart_items)
+        total_qty = sum(item["qty"] for item in cart_items)
+        pizza_names = ", ".join(item["name"] for item in cart_items)
 
         user = None
-
         if "user_id" in session:
             user = db.session.get(User, session["user_id"])
 
@@ -112,10 +113,22 @@ def success():
             user_id=user.id if user else None,
             customer_name=user.name if user else "Guest",
             customer_email=user.email if user else "guest@example.com",
+            pizza=pizza_names,
+            quantity=total_qty,
             total_price=total,
+            status="new",
         )
-
         db.session.add(order)
+        db.session.flush()
+
+        for item in cart_items:
+            db.session.add(OrderItem(
+                order_id=order.id,
+                product_id=item["id"],
+                quantity=item["qty"],
+                price=item["price"],
+            ))
+
         db.session.commit()
 
     session.pop("cart", None)
