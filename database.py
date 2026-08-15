@@ -1,6 +1,6 @@
 from sqlalchemy import inspect, text
 import bcrypt
-from models import Product, User, db
+from models import Product, User, Order, OrderItem, db
 
 DEFAULT_PRODUCTS = [
     {
@@ -102,3 +102,43 @@ def init_db():
     _migrate_users_role()
     seed_products()
     seed_users()
+    practice_order()
+
+def practice_order():
+    if Order.query.count() > 0:
+        return
+
+    product = Product.query.first()
+
+    if not product:
+        return
+
+    order = Order(
+        customer_name="Test Customer",
+        customer_email="test@gmail.com",
+        pizza=product.name,
+        quantity=2,
+        total_price=product.price * 2,
+        status="new"
+    )
+
+    db.session.add(order)
+    db.session.commit()
+
+    order_item = OrderItem(
+        order_id=order.id,
+        product_id=product.id,
+        quantity=2,
+        price=product.price
+    )
+
+    db.session.add(order_item)
+    db.session.commit()
+
+    result = db.session.execute(
+        text("SELECT * FROM order_items WHERE order_id = :order_id"),
+        {"order_id": order.id}
+    )
+
+    print("Created order item:")
+    print(result.fetchone())
