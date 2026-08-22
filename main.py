@@ -8,6 +8,7 @@ from routes.cart import cart_bp
 from routes.reviews import reviews_bp
 from routes.shop import shop_bp
 from routes.editpayment import edit_bp
+from routes.userorderspy import userorders_bp
 
 
 def create_app():
@@ -22,6 +23,7 @@ def create_app():
     app.register_blueprint(cart_bp)
     app.register_blueprint(reviews_bp)
     app.register_blueprint(edit_bp)
+    app.register_blueprint(userorders_bp)
 
     return app
 

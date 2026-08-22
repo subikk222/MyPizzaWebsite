@@ -18,22 +18,43 @@
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { padding: 10px; border: 1px solid #555; text-align: left; }
     th { background-color: #333; }
-    .btn {
-        padding: 6px 12px;
-        background-color: #04a2ff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        text-decoration: none;
-    }
-    .btn:hover { background-color: #0288d1; }
 </style>
 
 <div class="box">
-    
+    <h2>My Orders</h2>
+    <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
+    <hr>
 
-
-
-
+    {% if orders %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Pizza</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Arrival</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.pizza }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>${{ '%.2f'|format(order.total_price) }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.arrival_text }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>You have no orders yet.</p>
+    {% endif %}
 </div>
+
+
+
+
+
+
+
 {% endblock %}
