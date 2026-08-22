@@ -1,49 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %} Edit {% endblock %}
+{% block title %}Edit Orders{% endblock %}
 
 {% block content %}
 <style>
-    body {
-        background-color: #11111108
-    }
-    .edit-box {
+    body { background-color: #111; }
+    .box {
         background-color: #222;
-        color: black;
-        width: 420px;
-        margin: 40px auto;
+        color: white;
+        width: 90%;
+        max-width: 900px;
+        margin: 30px auto;
         padding: 25px;
         border-radius: 12px;
-        text-align: center;
         border: 1px solid #444;
-        box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
     }
-
-    .title {
-        color:white
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #555; text-align: left; }
+    th { background-color: #333; }
+    .btn {
+        padding: 6px 12px;
+        background-color: #04a2ff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
     }
+    .btn:hover { background-color: #0288d1; }
 </style>
 
-<div class="edit-box">
-    <div class="title">
-
-        <h2>Edit User Payment</h2>
-
-    </div>
-
-
+<div class="box">
+    <h2>Admin – All Orders</h2>
     <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
-
     <hr>
 
-    <p><strong>Search</strong> User by ID:</p>
-
-    <input type="text" name="search_user_id" placeholder="User ID">
-    <button type="submit">Search</button>
-
-    <hr>
+    {% if orders %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>Pizza</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer_name }}</td>
+            <td>{{ order.customer_email }}</td>
+            <td>{{ order.pizza }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>${{ '%.2f'|format(order.total_price) }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+                <a href="{{ url_for('edit.edit_order', order_id=order.id) }}" class="btn">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No orders yet.</p>
+    {% endif %}
 </div>
-
-
-
 {% endblock %}
