@@ -1,11 +1,52 @@
-
-
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import bcrypt
 from models import User, db
+import jwt
+import logging
+from functools import wraps
+
 
 auth_bp = Blueprint("auth", __name__)
+logging.basicConfig(level=logging.INFO)
+
+SECRET_KEY = "jwt-secret-key"
+ALGORITHM = "HS256"
+TOKEN_TTL_SECONDS = 60
+
+def create_token(username, role):
+    payload = {
+        "sub": username,
+        "role": role,
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            auth_bp.logger.info("[JWT] protected route called without Bearer token")
+            return jsonify({"error": "Authorization: Bearer <token> required"}), 401
+
+        token = auth_header.split(" ", 1)[1].strip()
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        except jwt.ExpiredSignatureError:
+            auth_bp.logger.info("[JWT] token expired")
+            return jsonify({"error": "Token expired"}), 401
+        except jwt.InvalidTokenError:
+            auth_bp.logger.info("[JWT] invalid token")
+            return jsonify({"error": "Invalid token"}), 401
+
+        request.user = payload
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+
+
 
 
 def _current_user():
