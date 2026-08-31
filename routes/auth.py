@@ -5,7 +5,9 @@ from models import User, db
 import jwt
 import logging
 from functools import wraps
+from datetime import datetime, timedelta, timezone
 
+logger = logging.getLogger(__name__)
 
 auth_bp = Blueprint("auth", __name__)
 logging.basicConfig(level=logging.INFO)
@@ -15,9 +17,12 @@ ALGORITHM = "HS256"
 TOKEN_TTL_SECONDS = 60
 
 def create_token(username, role):
+    now = datetime.now(timezone.utc)
     payload = {
         "sub": username,
         "role": role,
+        "iat": now,
+        "exp": now + timedelta(seconds=TOKEN_TTL_SECONDS)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -25,19 +30,26 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         auth_header = request.headers.get("Authorization", "")
-        if not auth_header.startswith("Bearer "):
-            auth_bp.logger.info("[JWT] protected route called without Bearer token")
-            return jsonify({"error": "Authorization: Bearer <token> required"}), 401
+        if auth_header.startswith("Bearer "):
+            token = auth_header.split(" ", 1)[1]
+        else:
+            token = session.get("jwt_token")
+        if not token:
+            auth_bp.logger.info("[JWT] no token")
+            return redirect(url_for("auth.login"))
 
-        token = auth_header.split(" ", 1)[1].strip()
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         except jwt.ExpiredSignatureError:
             auth_bp.logger.info("[JWT] token expired")
-            return jsonify({"error": "Token expired"}), 401
+            session.clear()
+            flash("Your session has been expired", "danger")
+            return redirect(url_for("auth.login"))
         except jwt.InvalidTokenError:
             auth_bp.logger.info("[JWT] invalid token")
-            return jsonify({"error": "Invalid token"}), 401
+            session.clear()
+            flash("Invalid authentication token", "danger")
+            return redirect(url_for("auth.login"))
 
         request.user = payload
         return f(*args, **kwargs)
@@ -59,6 +71,7 @@ def _current_user():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@token_required
 def login():
     if request.method == "POST":
         email = request.form["email"]
@@ -80,6 +93,8 @@ def login():
                 session["user_name"] = user.name
                 session["user_role"] = user.role
 
+                session["jwt_token"] = create_token(user.email, user.role)
+
                 if user.role == "admin":
                     return redirect(url_for("auth.profile_admin"))
 
@@ -91,6 +106,7 @@ def login():
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
+@token_required
 def register():
     if request.method == "POST":
         name = request.form["name"]
@@ -128,6 +144,7 @@ def register():
 
 
 @auth_bp.route("/profile")
+@token_required
 def profile():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
@@ -141,6 +158,7 @@ def profile():
 
 
 @auth_bp.route("/profileadmin")
+@token_required
 def profile_admin():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
@@ -160,6 +178,7 @@ def logout():
 
 
 @auth_bp.route("/reset_name", methods=["POST"])
+@token_required
 def reset_name():
     user = _current_user()
     if not user:
@@ -178,6 +197,7 @@ def reset_name():
 
 
 @auth_bp.route("/reset_number", methods=["POST"])
+@token_required
 def reset_number():
     user = _current_user()
     if not user:
@@ -195,6 +215,7 @@ def reset_number():
 
 
 @auth_bp.route("/reset_email", methods=["POST"])
+@token_required
 def reset_email():
     user = _current_user()
     if not user:
@@ -217,6 +238,7 @@ def reset_email():
 
 
 @auth_bp.route("/reset_password", methods=["POST"])
+@token_required
 def reset_password():
     user = _current_user()
     if not user:
@@ -244,12 +266,14 @@ def reset_password():
 
 
 @auth_bp.route("/users", methods=["GET"])
+@token_required
 def get_users():
     users = User.query.order_by(User.id.desc()).all()
     return jsonify([user.to_dict() for user in users])
 
 
 @auth_bp.route("/users", methods=["POST"])
+@token_required
 def create_user():
     data = request.get_json(silent=True) or {}
 
@@ -269,6 +293,7 @@ def create_user():
 
 
 @auth_bp.route("/users/<int:user_id>", methods=["GET"])
+@token_required
 def get_user(user_id):
     user = db.session.get(User, user_id)
     if user is None:
@@ -278,6 +303,7 @@ def get_user(user_id):
 
 
 @auth_bp.route("/users/<int:user_id>", methods=["PUT"])
+@token_required
 def update_user_put(user_id):
     data = request.get_json(silent=True) or {}
 
@@ -299,6 +325,7 @@ def update_user_put(user_id):
 
 
 @auth_bp.route("/users/<int:user_id>", methods=["PATCH"])
+@token_required
 def update_user_patch(user_id):
     data = request.get_json(silent=True) or {}
 
@@ -329,6 +356,7 @@ def update_user_patch(user_id):
 
 
 @auth_bp.route("/users/<int:user_id>", methods=["DELETE"])
+@token_required
 def delete_user(user_id):
     user = db.session.get(User, user_id)
     if user is None:
