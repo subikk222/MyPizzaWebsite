@@ -27,6 +27,7 @@
         text-decoration: none;
     }
     .btn:hover { background-color: #0288d1; }
+    .timer { font-weight: bold; color: #04a2ff; }
 </style>
 
 <div class="box">
@@ -44,17 +45,27 @@
             <th>Qty</th>
             <th>Total</th>
             <th>Status</th>
+            <th>Created</th>
+            <th>Info</th>
             <th>Action</th>
         </tr>
         {% for order in orders %}
-        <tr>
+        <tr class="order-row" data-status="{{ order.status }}" data-created="{{ order.created_at.isoformat() if order.created_at else '' }}">
             <td>{{ order.id }}</td>
             <td>{{ order.customer_name }}</td>
             <td>{{ order.customer_email }}</td>
             <td>{{ order.pizza }}</td>
             <td>{{ order.quantity }}</td>
             <td>${{ '%.2f'|format(order.total_price) }}</td>
-            <td>{{ order.status }}</td>
+            <td class="status-cell">{{ order.status }}</td>
+            <td>
+                {% if order.created_at %}
+                    {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td class="arrival-cell">{{ order.arrival_text }}</td>
             <td>
                 <a href="{{ url_for('admin_orders.edit_order', order_id=order.id) }}" class="btn">Edit</a>
             </td>
@@ -62,7 +73,70 @@
         {% endfor %}
     </table>
     {% else %}
-        <p>No orders yet.</p>
+        <p>You have no orders yet.</p>
     {% endif %}
 </div>
+
+<script>
+(function () {
+    const DELIVERY_AFTER_MS = 2 * 60 * 60 * 1000; // 2 години
+
+    function parseCreated(value) {
+        if (!value) return null;
+        const normalized = /Z$|[+-]\d{2}:\d{2}$/.test(value) ? value : value + "Z";
+        const date = new Date(normalized);
+        return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatRemaining(totalSeconds) {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        if (hours > 0) return hours + "h " + minutes + "m " + seconds + "s";
+        if (minutes > 0) return minutes + "m " + seconds + "s";
+        return seconds + "s";
+    }
+
+    function tick() {
+        let needReload = false;
+
+        document.querySelectorAll(".order-row").forEach(function (row) {
+            const status = row.dataset.status;
+            const statusCell = row.querySelector(".status-cell");
+            const arrivalCell = row.querySelector(".arrival-cell");
+            const created = parseCreated(row.dataset.created);
+
+            if (status === "cancelled") {
+                arrivalCell.textContent = "Your delivery canceled";
+                return;
+            }
+
+            if (status === "delivered" || !created) {
+                statusCell.textContent = "delivered";
+                arrivalCell.textContent = "Delivered";
+                return;
+            }
+
+            const arriveAt = created.getTime() + DELIVERY_AFTER_MS;
+            const secondsLeft = Math.ceil((arriveAt - Date.now()) / 1000);
+
+            if (secondsLeft > 0) {
+                arrivalCell.textContent = "Arrives in " + formatRemaining(secondsLeft);
+            } else {
+                row.dataset.status = "delivered";
+                statusCell.textContent = "delivered";
+                arrivalCell.textContent = "Delivered";
+                needReload = true;
+            }
+        });
+
+        if (needReload) {
+            window.location.reload();
+        }
+    }
+
+    tick();
+    setInterval(tick, 1000);
+})();
+</script>
 {% endblock %}

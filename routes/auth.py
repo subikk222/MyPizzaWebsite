@@ -8,6 +8,7 @@ from flask import (
     flash,
     make_response,
     current_app,
+    session,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 import bcrypt
@@ -67,6 +68,7 @@ def _login_success_response(user, *, json_mode=False):
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@token_required
 def login():
     if request.method == "POST":
         email = request.form["email"]
@@ -75,6 +77,29 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and _verify_password(user, password):
             return _login_success_response(user, json_mode=False)
+
+        if user:
+            # verify password depending on stored scheme (bcrypt for admin, werkzeug for others)
+            if user.role == "admin":
+                valid = bcrypt.checkpw(
+                    password.encode("utf-8"),
+                    user.password.encode("utf-8")
+                )
+            else:
+                valid = check_password_hash(user.password, password)
+
+            if valid:
+                session["user_id"] = user.id
+                session["user_name"] = user.name
+                session["user_role"] = user.role
+
+                # issue token via shared auth_jwt helper and keep in session for browser flows
+                session["jwt_token"] = create_token(user.email, user.role)
+
+                if user.role == "admin":
+                    return redirect(url_for("auth.profile_admin"))
+
+                return redirect(url_for("auth.profile"))
 
         logger.info("[JWT] login failed: %s", email or "(empty)")
         flash("Invalid email or password", "danger")
@@ -98,6 +123,7 @@ def api_login():
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
+@token_required
 def register():
     if request.method == "POST":
         name = request.form["name"]
