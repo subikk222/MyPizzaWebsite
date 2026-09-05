@@ -48,6 +48,15 @@ def _sync_order_items(order):
 @admin_required
 def list_orders():
     orders = Order.query.order_by(Order.id.desc()).all()
+    for order in orders:
+        if order.status == "delivered":
+            order.arrival_text = "Delivered"
+        elif order.status == "cancelled":
+            order.arrival_text = "Cancelled"
+        elif order.status == "preparing":
+            order.arrival_text = "Preparing"
+        else:
+            order.arrival_text = "New"
     return render_template("admin_orders.html", orders=orders)
 
 

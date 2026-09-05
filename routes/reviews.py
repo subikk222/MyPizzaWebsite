@@ -17,9 +17,9 @@ def score():
         db.session.add(review)
         db.session.commit()
         return redirect(url_for("reviews.thankyou"))
-    return render_template("score.html")
+    return render_template("review.html")
 
 
 @reviews_bp.route("/thankyou")
 def thankyou():
-    return render_template("thank.html")
+    return render_template("thank_you.html")
