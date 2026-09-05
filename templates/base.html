@@ -27,20 +27,16 @@
             <li><a href="{{ url_for('reviews.score') }}" class="menu-btn">Review</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            {% if session.get('user_id') %}
+            {% if current_user %}
                 <li>
                     <a href="{{ url_for('auth.profile') }}">
-                        <span class="glyphicon glyphicon-user"></span> {{ session.get('user_name', 'Profile') }}
-
+                        <span class="glyphicon glyphicon-user"></span> {{ current_user.name }}
                     </a>
-
                 </li>
-                {% if session.get('user_role') == 'admin' %}
+                {% if current_user.role == 'admin' %}
                     <li>
-
                         <a href="{{ url_for('auth.profile_admin') }}">
                             <span> Admin Panel</span>
-
                         </a>
                     </li>
                 {% endif %}

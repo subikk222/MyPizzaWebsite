@@ -7,8 +7,8 @@ from routes.auth import auth_bp
 from routes.cart import cart_bp
 from routes.reviews import reviews_bp
 from routes.shop import shop_bp
-from routes.editpayment import edit_bp
-from routes.userorderspy import userorders_bp
+from routes.admin_orders import admin_orders_bp
+from routes.user_orders import user_orders_bp
 
 
 def create_app():
@@ -18,12 +18,19 @@ def create_app():
     db.init_app(app)
     stripe.api_key = app.config["STRIPE_SECRET_KEY"]
 
+    @app.context_processor
+    def inject_auth_user():
+        """Templates: current_user замість session.user_*."""
+        from auth_jwt import get_current_user
+
+        return {"current_user": get_current_user()}
+
     app.register_blueprint(shop_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(cart_bp)
     app.register_blueprint(reviews_bp)
-    app.register_blueprint(edit_bp)
-    app.register_blueprint(userorders_bp)
+    app.register_blueprint(admin_orders_bp)
+    app.register_blueprint(user_orders_bp)
 
     return app
 

@@ -15,3 +15,8 @@ class Config:
     DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", SECRET_KEY)
+    JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+    JWT_TTL_SECONDS = int(os.getenv("JWT_TTL_SECONDS", "7200"))
+    JWT_COOKIE_SECURE = os.getenv("JWT_COOKIE_SECURE", "False").lower() == "true"

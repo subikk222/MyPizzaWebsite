@@ -1,31 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 
-from models import Order, OrderItem, Product, User, db
+from models import Order, OrderItem, Product, db
+from auth_jwt import admin_required
 
-edit_bp = Blueprint("edit", __name__)
+admin_orders_bp = Blueprint("admin_orders", __name__)
 
 ALLOWED_STATUSES = {"new", "preparing", "delivered", "cancelled"}
 
 
-def _require_admin():
-
-    user_id = session.get("user_id")
-    if not user_id:
-        flash("Access denied", "danger")
-        return None
-
-    user = db.session.get(User, user_id)
-    if not user or user.role != "admin":
-        flash("Access denied", "danger")
-        return None
-
-
-    session["user_role"] = user.role
-    return user
-
-
 def _sync_order_items(order):
-
     items = OrderItem.query.filter_by(order_id=order.id).all()
     unit_price = (
         round(order.total_price / order.quantity, 2)
@@ -39,7 +22,6 @@ def _sync_order_items(order):
         return
 
     if len(items) > 1:
-
         product_id = items[0].product_id
         for item in items:
             db.session.delete(item)
@@ -62,24 +44,20 @@ def _sync_order_items(order):
         ))
 
 
-@edit_bp.route("/editpayment", methods=["GET"])
-def edit():
-    if not _require_admin():
-        return redirect(url_for("shop.index"))
-
+@admin_orders_bp.route("/admin/orders", methods=["GET"])
+@admin_required
+def list_orders():
     orders = Order.query.order_by(Order.id.desc()).all()
-    return render_template("edit.html", orders=orders)
+    return render_template("admin_orders.html", orders=orders)
 
 
-@edit_bp.route("/editpayment/<int:order_id>", methods=["GET", "POST"])
+@admin_orders_bp.route("/admin/orders/<int:order_id>", methods=["GET", "POST"])
+@admin_required
 def edit_order(order_id):
-    if not _require_admin():
-        return redirect(url_for("shop.index"))
-
     order = db.session.get(Order, order_id)
     if not order:
         flash("Order not found", "danger")
-        return redirect(url_for("edit.edit"))
+        return redirect(url_for("admin_orders.list_orders"))
 
     if request.method == "POST":
         order.customer_name = (request.form.get("customer_name") or order.customer_name).strip()
@@ -91,23 +69,21 @@ def edit_order(order_id):
             order.total_price = float(request.form.get("total_price", order.total_price))
         except (TypeError, ValueError):
             flash("Quantity and Total Price must be numbers", "danger")
-            return render_template("edit_order.html", order=order)
+            return render_template("admin_order_edit.html", order=order)
 
         if order.quantity < 1:
             flash("Quantity less 1.", "danger")
-            return render_template("edit_order.html", order=order)
+            return render_template("admin_order_edit.html", order=order)
 
         new_status = request.form.get("status", order.status)
         if new_status not in ALLOWED_STATUSES:
             flash("Invalid Status.", "danger")
-            return render_template("edit_order.html", order=order)
+            return render_template("admin_order_edit.html", order=order)
 
         order.status = new_status
-
         _sync_order_items(order)
-
         db.session.commit()
         flash("Order updated successfully!", "success")
-        return redirect(url_for("edit.edit"))
+        return redirect(url_for("admin_orders.list_orders"))
 
-    return render_template("edit_order.html", order=order)
+    return render_template("admin_order_edit.html", order=order)

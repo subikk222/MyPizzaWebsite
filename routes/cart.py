@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, current_app
 
-from models import Product, Order, OrderItem, User, db
+from models import Product, Order, OrderItem, db
 
 import stripe
 
@@ -105,9 +105,9 @@ def success():
         total_qty = sum(item["qty"] for item in cart_items)
         pizza_names = ", ".join(item["name"] for item in cart_items)
 
-        user = None
-        if "user_id" in session:
-            user = db.session.get(User, session["user_id"])
+        from auth_jwt import get_current_user
+
+        user = get_current_user()
 
         order = Order(
             user_id=user.id if user else None,

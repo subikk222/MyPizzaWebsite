@@ -70,11 +70,11 @@
         background-color: #449d44;
     }
 
-    .editpayment-btn {
+    .admin-orders-btn {
         background-color: #04a2ff
     }
 
-    .editpayment-btn:hover {
+    .admin-orders-btn:hover {
         background-color: #04a2ff93
     }
 </style>
@@ -83,7 +83,7 @@
 
     <h2>Administrator Profile</h2>
 
-    <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
+    <p>Welcome <strong>{{ current_user.name if current_user else name }}</strong></p>
 
     <hr>
 
@@ -100,8 +100,8 @@
         <button class="btn logout-btn">Logout</button>
     </a>
 
-    <a href="{{ url_for('edit.edit') }}">
-        <button class="btn editpayment-btn">Edit Order</button>
+    <a href="{{ url_for('admin_orders.list_orders') }}">
+        <button class="btn admin-orders-btn">Edit Order</button>
     </a>
 </div>
 

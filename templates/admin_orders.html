@@ -31,7 +31,7 @@
 
 <div class="box">
     <h2>Admin – All Orders</h2>
-    <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
+    <p>Welcome <strong>{{ current_user.name if current_user else '' }}</strong></p>
     <hr>
 
     {% if orders %}
@@ -56,7 +56,7 @@
             <td>${{ '%.2f'|format(order.total_price) }}</td>
             <td>{{ order.status }}</td>
             <td>
-                <a href="{{ url_for('edit.edit_order', order_id=order.id) }}" class="btn">Edit</a>
+                <a href="{{ url_for('admin_orders.edit_order', order_id=order.id) }}" class="btn">Edit</a>
             </td>
         </tr>
         {% endfor %}

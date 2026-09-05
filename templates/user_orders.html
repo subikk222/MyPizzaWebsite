@@ -23,7 +23,7 @@
 
 <div class="box">
     <h2>My Orders</h2>
-    <p>Welcome <strong>{{ session.get('user_name') }}</strong></p>
+    <p>Welcome <strong>{{ current_user.name if current_user else '' }}</strong></p>
     <hr>
 
     {% if orders %}
@@ -57,15 +57,22 @@
 
 <script>
 (function () {
-    const NEW_SECONDS = 10;
-    const TOTAL_SECONDS = 15;
+    const DELIVERY_AFTER_MS = 2 * 60 * 60 * 1000; // 2 години
 
     function parseCreated(value) {
         if (!value) return null;
-        // SQLite / Python naive UTC → додаємо Z, якщо немає часового поясу
         const normalized = /Z$|[+-]\d{2}:\d{2}$/.test(value) ? value : value + "Z";
         const date = new Date(normalized);
         return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatRemaining(totalSeconds) {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        if (hours > 0) return hours + "h " + minutes + "m " + seconds + "s";
+        if (minutes > 0) return minutes + "m " + seconds + "s";
+        return seconds + "s";
     }
 
     function tick() {
@@ -81,39 +88,26 @@
                 arrivalCell.textContent = "Your delivery canceled";
                 return;
             }
+
             if (status === "delivered" || !created) {
                 statusCell.textContent = "delivered";
-                arrivalCell.textContent = "Your delivery arrived";
+                arrivalCell.textContent = "Delivered";
                 return;
             }
 
-            const elapsed = (Date.now() - created.getTime()) / 1000;
-            let nextStatus = status;
-            let text;
+            const arriveAt = created.getTime() + DELIVERY_AFTER_MS;
+            const secondsLeft = Math.ceil((arriveAt - Date.now()) / 1000);
 
-            if (elapsed < NEW_SECONDS) {
-                nextStatus = "new";
-                const left = Math.max(0, Math.ceil(NEW_SECONDS - elapsed));
-                text = "Your delivery will arrive in " + left + " seconds";
-            } else if (elapsed < TOTAL_SECONDS) {
-                nextStatus = "preparing";
-                const left = Math.max(0, Math.ceil(TOTAL_SECONDS - elapsed));
-                text = "Your delivery will arrive in " + left + " seconds";
+            if (secondsLeft > 0) {
+                arrivalCell.textContent = "Arrives in " + formatRemaining(secondsLeft);
             } else {
-                nextStatus = "delivered";
-                text = "Your delivery arrived";
-            }
-
-            if (nextStatus !== status) {
-                row.dataset.status = nextStatus;
+                row.dataset.status = "delivered";
+                statusCell.textContent = "delivered";
+                arrivalCell.textContent = "Delivered";
                 needReload = true;
             }
-
-            statusCell.textContent = nextStatus;
-            arrivalCell.textContent = text;
         });
 
-        // коли статус мав змінитись — перезавантажуємо, щоб зберегти в БД на сервері
         if (needReload) {
             window.location.reload();
         }
