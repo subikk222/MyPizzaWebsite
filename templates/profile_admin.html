@@ -77,6 +77,13 @@
     .admin-orders-btn:hover {
         background-color: #04a2ff93
     }
+    .edit-user-btn {
+        background-color: #ffd400
+    }
+
+    .edit-user-btn:hover {
+        background-color: #f3ef1993
+    }
 </style>
 
 <div class="profile-box">
@@ -102,6 +109,10 @@
 
     <a href="{{ url_for('admin_orders.list_orders') }}">
         <button class="btn admin-orders-btn">Edit Order</button>
+    </a>
+
+    <a href="{{ url_for('admin_users.edit_user') }}">
+        <button class="btn edit-user-btn">Edit User</button>
     </a>
 </div>
 
