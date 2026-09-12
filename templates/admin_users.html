@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Users{% endblock %}
+
+{% block content %}
+<style>
+    body { background-color: #111; }
+    .box {
+        background-color: #222;
+        color: white;
+        width: 90%;
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid #444;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #555; text-align: left; }
+    th { background-color: #333; }
+    .btn {
+        padding: 6px 12px;
+        background-color: #ffd400;
+        color: #111;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .btn:hover { background-color: #e6bf00; }
+</style>
+
+<div class="box">
+    <h2>Admin – All Users</h2>
+    <p>Welcome <strong>{{ current_user.name if current_user else '' }}</strong></p>
+    <hr>
+
+    {% if users %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone }}</td>
+            <td>{{ user.role }}</td>
+            <td>
+                <a href="{{ url_for('admin_users.edit_user', user_id=user.id) }}" class="btn">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+</div>
+{% endblock %}

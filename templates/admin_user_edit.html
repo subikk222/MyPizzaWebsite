@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+<style>
+    body { background-color: #111; }
+    .box {
+        background-color: #222;
+        color: white;
+        width: 420px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid #444;
+    }
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin: 8px 0 15px 0;
+        border-radius: 4px;
+        border: 1px solid #555;
+        background: #333;
+        color: white;
+        box-sizing: border-box;
+    }
+    .btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #ffd400;
+        color: #111;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .btn:hover { background-color: #e6bf00; }
+    .hint { color: #aaa; font-size: 13px; margin-top: -10px; margin-bottom: 12px; }
+</style>
+
+<div class="box">
+    <h2>Edit User #{{ user.id }}</h2>
+
+    <form method="POST">
+        <label>Name</label>
+        <input type="text" name="name" value="{{ user.name }}" required>
+
+        <label>Email</label>
+        <input type="email" name="email" value="{{ user.email }}" required>
+
+        <label>Phone</label>
+        <input type="text" name="phone" value="{{ user.phone }}">
+
+        <label>Role</label>
+        <select name="role">
+            <option value="user" {% if user.role == 'user' %}selected{% endif %}>user</option>
+            <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>admin</option>
+        </select>
+
+        <label>New password</label>
+        <input type="password" name="new_password" minlength="6" autocomplete="new-password">
+        <p class="hint">Leave empty to keep the current password.</p>
+
+        <button type="submit" class="btn">Save Changes</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('admin_users.list_users') }}" style="color:#ffd400;">← Back to all users</a>
+</div>
+{% endblock %}
